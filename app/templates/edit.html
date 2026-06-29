@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑 · 第{{ chapter.number }}章 {{ chapter.title }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <a href="/chapter/{{ chapter.number }}" class="back-link">← 返回阅读</a>
+  </header>
+
+  <main>
+    <h2>编辑 · 第{{ chapter.number }}章 {{ chapter.title }}</h2>
+    <form method="POST" class="publish-form">
+      <div class="form-group">
+        <label>章节标题</label>
+        <input type="text" value="{{ chapter.title }}" disabled>
+        <span class="hint">标题如需修改，请直接重命名文件</span>
+      </div>
+      <div class="form-group">
+        <label for="content">正文内容</label>
+        <textarea id="content" name="content" rows="30" required>{{ content }}</textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">💾 保存</button>
+        <a href="/chapter/{{ chapter.number }}" class="btn-cancel">取消</a>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: suishi-writer
+    env: node
+    buildCommand: npm install --production
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DB_DIR
+        value: /var/data
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1

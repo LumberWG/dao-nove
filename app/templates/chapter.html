@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第{{ chapter.number }}章 {{ chapter.title }} · 小说管理</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <div class="header-actions">
+      <a href="/edit/{{ chapter.number }}" class="btn-edit">✏️ 编辑</a>
+      <form action="/delete/{{ chapter.number }}" method="POST" class="inline-form"
+            onsubmit="return confirm('确认删除第{{ chapter.number }}章「{{ chapter.title }}」？\n文件会移到备份目录。')">
+        <button type="submit" class="btn-delete">🗑️ 删除</button>
+      </form>
+    </div>
+  </header>
+
+  <nav class="chapter-nav">
+    <a href="/" class="back-link">← 返回目录</a>
+  </nav>
+
+  <main class="reading">
+    <h2>第{{ chapter.number }}章 {{ chapter.title }}</h2>
+    <div class="chapter-content">
+      {{ content | safe }}
+    </div>
+  </main>
+
+  <nav class="chapter-nav bottom">
+    {% if prev %}
+    <a href="/chapter/{{ prev.number }}" class="nav-link prev">← 第{{ prev.number }}章 {{ prev.title }}</a>
+    {% endif %}
+    <a href="/" class="back-link">← 返回目录</a>
+    {% if next %}
+    <a href="/chapter/{{ next.number }}" class="nav-link next">第{{ next.number }}章 {{ next.title }} →</a>
+    {% endif %}
+  </nav>
+
+  <footer>
+    <p>第{{ chapter.number }}章 · 文件名: {{ chapter.filename }}</p>
+  </footer>
+</div>
+</body>
+</html>

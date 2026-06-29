@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($content = Get-Content \"d:\\\\Study\\\\Dao\\\\第2章_两种未来.md\" -Raw -Encoding UTF8; $chineseChars = [regex]::Matches\\($content, '[一-鿿㐀-䶿]'\\); Write-Output \"第2章 中文字: $\\($chineseChars.Count\\)\")"
+    ]
+  }
+}

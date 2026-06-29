@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发布新章 · 小说管理</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <a href="/" class="back-link">← 返回目录</a>
+  </header>
+
+  <main>
+    <h2>发布新章节</h2>
+    <form method="POST" class="publish-form">
+      <div class="form-group">
+        <label for="title">章节标题</label>
+        <input type="text" id="title" name="title" placeholder="例：心湖" required>
+        <span class="hint">将自动生成章号和文件名</span>
+      </div>
+      <div class="form-group">
+        <label for="content">正文内容</label>
+        <textarea id="content" name="content" rows="30" placeholder="在此写入章节正文……" required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">🚀 发布</button>
+        <a href="/" class="btn-cancel">取消</a>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>

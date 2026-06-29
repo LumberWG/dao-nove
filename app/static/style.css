@@ -1,0 +1,264 @@
+/* ── 基础 ──────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  background: #f5f2ed;
+  color: #2c2c2c;
+  line-height: 1.8;
+  min-height: 100vh;
+}
+
+a { color: #5a4a3a; text-decoration: none; }
+a:hover { color: #8b6914; }
+
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ── 头部 ──────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
+  border-bottom: 2px solid #e0d6c8;
+  margin-bottom: 24px;
+}
+
+header h1 { font-size: 22px; font-weight: 600; }
+header h1 a { color: #2c2c2c; }
+header h1 a:hover { color: #8b6914; }
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-form { display: inline; }
+
+/* ── 按钮 ──────────────────────────────────── */
+.btn-primary, .btn-edit, .btn-delete, .btn-cancel {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary {
+  background: #5a4a3a;
+  color: #fff;
+}
+.btn-primary:hover { background: #7a6a5a; color: #fff; }
+
+.btn-edit {
+  background: #e8dcc8;
+  color: #5a4a3a;
+}
+.btn-edit:hover { background: #d8ccb8; }
+
+.btn-delete {
+  background: #e8c8c0;
+  color: #8a3a2a;
+}
+.btn-delete:hover { background: #d8b8b0; }
+
+.btn-cancel {
+  background: #e0d6c8;
+  color: #5a4a3a;
+}
+.btn-cancel:hover { background: #d0c6b8; }
+
+.back-link {
+  font-size: 14px;
+  color: #8a7a6a;
+}
+.back-link:hover { color: #5a4a3a; }
+
+/* ── 章节列表 ──────────────────────────────── */
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chapter-card {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0d6c8;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.chapter-card:hover {
+  border-color: #b8a898;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.ch-number {
+  min-width: 72px;
+  font-weight: 600;
+  color: #8b6914;
+}
+
+.ch-title {
+  flex: 1;
+  font-size: 16px;
+}
+
+.ch-arrow {
+  color: #c0b0a0;
+  font-size: 18px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8a7a6a;
+}
+.empty-state p { margin-bottom: 16px; }
+
+/* ── 阅读页 ────────────────────────────────── */
+.reading {
+  background: #fff;
+  border-radius: 8px;
+  padding: 40px 48px;
+  border: 1px solid #e0d6c8;
+  margin-bottom: 20px;
+}
+
+.reading h2 {
+  font-size: 24px;
+  margin-bottom: 28px;
+  text-align: center;
+  color: #2c2c2c;
+}
+
+.chapter-content {
+  font-size: 16px;
+  color: #3c3c3c;
+  line-height: 2;
+}
+
+.chapter-content p {
+  margin-bottom: 0.8em;
+  text-indent: 2em;
+}
+
+.chapter-content br {
+  content: "";
+  display: block;
+  margin-top: 0.4em;
+}
+
+.chapter-content strong { color: #2c2c2c; }
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.chapter-nav.bottom {
+  margin-top: 0;
+  padding-top: 16px;
+  border-top: 1px solid #e0d6c8;
+}
+
+.nav-link {
+  font-size: 14px;
+  color: #5a4a3a;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-link:hover { color: #8b6914; }
+
+/* ── 发布/编辑 表单 ────────────────────────── */
+.publish-form {
+  background: #fff;
+  border: 1px solid #e0d6c8;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #5a4a3a;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #d0c6b8;
+  border-radius: 6px;
+  background: #faf8f5;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  line-height: 1.8;
+  border: 1px solid #d0c6b8;
+  border-radius: 6px;
+  background: #faf8f5;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.hint {
+  display: block;
+  font-size: 12px;
+  color: #a09080;
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 12px;
+}
+
+/* ── 底部 ──────────────────────────────────── */
+footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e0d6c8;
+  text-align: center;
+  font-size: 12px;
+  color: #a09080;
+}
+
+/* ── 响应式 ────────────────────────────────── */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .reading { padding: 20px 16px; }
+  .reading h2 { font-size: 20px; }
+  .publish-form { padding: 20px 16px; }
+  header { flex-direction: column; align-items: flex-start; }
+}

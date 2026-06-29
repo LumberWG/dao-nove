@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小说管理 · 阅读平台</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <a href="/publish" class="btn-primary">✏️ 发布新章</a>
+  </header>
+
+  <main>
+    <div class="chapter-list">
+      {% if chapters %}
+        {% for ch in chapters %}
+        <a href="/chapter/{{ ch.number }}" class="chapter-card">
+          <span class="ch-number">第{{ ch.number }}章</span>
+          <span class="ch-title">{{ ch.title }}</span>
+          <span class="ch-arrow">→</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>还没有任何章节</p>
+          <a href="/publish" class="btn-primary">发布第一章</a>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    <p>共 {{ chapters|length }} 章 · 本地运行 · 文件自动管理</p>
+  </footer>
+</div>
+</body>
+</html>
