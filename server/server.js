@@ -186,7 +186,7 @@ app.get('/novel/:id', (req, res) => {
                     <a href="/chapter/${ch.id}/read" style="text-decoration:none;color:#333;font-size:15px;">${ch.title || '无标题'}</a>
                     <div style="font-size:12px;color:#999;margin-top:2px;">
                         <span class="tag">${ch.word_count}字</span>
-                        <span class="tag">${ch.status === 'published' ? '已发布' : '草稿'}</span>
+                        <span class="tag">${ch.status === 'published' ? '定稿' : '初稿'}</span>
                         <span style="margin-left:8px;">${ch.updated_at}</span>
                     </div>
                 </div>
