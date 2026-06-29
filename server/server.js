@@ -339,7 +339,7 @@ app.get('/docs/:file', (req, res) => {
         return res.status(404).send('文档不存在');
     }
     const content = fs.readFileSync(filePath, 'utf8');
-    const html = marked.parse(content);
+    const html = marked.parse(content, {breaks: true});
     const body = `
     <div class="container" style="max-width:860px;">
         <a href="/docs" class="btn btn-outline btn-sm mb10">← 设定文档</a>
@@ -378,7 +378,7 @@ app.get('/chapter/:id/read', (req, res) => {
     const ch = getChapter.get(req.params.id);
     if (!ch) return res.status(404).send('章节不存在');
     const novel = getNovel.get(ch.novel_id);
-    const html = marked.parse(ch.content);
+    const html = marked.parse(ch.content, {breaks: true});
     const chapters = getChapters.all(ch.novel_id);
     const idx = chapters.findIndex(c => c.id == req.params.id);
     const prev = idx > 0 ? chapters[idx-1] : null;
@@ -464,7 +464,7 @@ app.get('/chapter/:id/edit', (req, res) => {
             if(previewVisible) {
                 editor.style.display = 'none';
                 preview.style.display = 'block';
-                preview.innerHTML = marked.parse(editor.value);
+                preview.innerHTML = marked.parse(editor.value, {breaks: true});
             } else {
                 editor.style.display = 'block';
                 preview.style.display = 'none';
