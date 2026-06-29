@@ -18,3 +18,10 @@ _backup/
 
 # Flask 临时文件
 *.pid
+
+# Node.js
+node_modules/
+
+# SQLite 运行时文件
+*.db-shm
+*.db-wal
