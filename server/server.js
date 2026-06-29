@@ -120,6 +120,7 @@ function navBar(currentNovel) {
     return `<div class="nav-bar"><div class="container" style="max-width:860px;">
         <a href="/" style="font-weight:500;color:#333;">写作系统</a>
         ${novelLinks}
+        <a href="/docs">设定文档</a>
         <span style="flex:1"></span>
         <a href="/novel/${currentNovel}/settings">设置</a>
     </div></div>`;
@@ -274,6 +275,51 @@ app.get('/novel/:id/import', (req, res) => {
     res.redirect(`/novel/${novelId}`);
 });
 
+// ── 设定文档 ──
+const DOCS_DIR = path.resolve(__dirname, '..', 'docs');
+
+app.get('/docs', (req, res) => {
+    const files = fs.readdirSync(DOCS_DIR)
+        .filter(f => f.endsWith('.md'))
+        .map(f => {
+            const content = fs.readFileSync(path.join(DOCS_DIR, f), 'utf8');
+            const firstLine = content.split('\n')[0].replace(/^#\s*/, '').trim();
+            return { file: f, title: firstLine || f.replace('.md', '') };
+        });
+    const body = `
+    <div class="container">
+        <a href="/" class="btn btn-outline btn-sm mb10">← 返回</a>
+        <h1>设定文档</h1>
+        <div class="subtitle">世界观、人物、伏笔等设定资料</div>
+        <div class="gap20">
+            ${files.map(f => `
+                <a href="/docs/${encodeURIComponent(f.file)}" class="card" style="display:block;text-decoration:none;color:inherit;flex:1;min-width:260px;">
+                    <div style="font-size:15px;font-weight:500;">${f.title}</div>
+                    <div style="font-size:12px;color:#bbb;margin-top:4px;">${f.file}</div>
+                </a>
+            `).join('')}
+        </div>
+    </div>`;
+    res.send(layout('设定文档', body, `<style>.content p{text-indent:2em;margin:0.8em 0;}.content h1{text-align:center;text-indent:0;margin:30px 0;}.content h2{font-size:20px;margin:24px 0 12px;border-left:3px solid #d4a853;padding-left:12px;}.content h3{font-size:17px;margin:20px 0 8px;}.content ul,.content ol{margin:0.5em 0 0.5em 1.5em;}.content table{border-collapse:collapse;width:100%;margin:12px 0;}.content td,.content th{border:1px solid #ddd;padding:6px 10px;font-size:14px;}.content th{background:#f5f3ef;}</style>`));
+});
+
+app.get('/docs/:file', (req, res) => {
+    const filePath = path.join(DOCS_DIR, decodeURIComponent(req.params.file));
+    if (!fs.existsSync(filePath) || !filePath.startsWith(DOCS_DIR)) {
+        return res.status(404).send('文档不存在');
+    }
+    const content = fs.readFileSync(filePath, 'utf8');
+    const html = marked.parse(content);
+    const body = `
+    <div class="container" style="max-width:860px;">
+        <a href="/docs" class="btn btn-outline btn-sm mb10">← 设定文档</a>
+        <div class="content" style="font-family:'Noto Serif SC','Source Han Serif SC',serif;font-size:17px;line-height:2;color:#333;">
+            ${html}
+        </div>
+    </div>`;
+    res.send(layout(req.params.file.replace('.md', ''), body, `<style>.content p{text-indent:2em;margin:0.8em 0;}.content h1{text-align:center;text-indent:0;margin:30px 0;}.content h2{font-size:20px;margin:24px 0 12px;border-left:3px solid #d4a853;padding-left:12px;}.content h3{font-size:17px;margin:20px 0 8px;}.content ul,.content ol{margin:0.5em 0 0.5em 1.5em;}.content table{border-collapse:collapse;width:100%;margin:12px 0;}.content td,.content th{border:1px solid #ddd;padding:6px 10px;font-size:14px;}.content th{background:#f5f3ef;}</style>`));
+});
+
 // Export all chapters as individual .md files
 app.get('/novel/:id/export', (req, res) => {
     const novelId = req.params.id;
@@ -317,7 +363,7 @@ app.get('/chapter/:id/read', (req, res) => {
             ${prev ? `<a href="/chapter/${prev.id}/read" class="btn btn-outline btn-sm">← 上一章</a>` : ''}
             ${next ? `<a href="/chapter/${next.id}/read" class="btn btn-outline btn-sm">下一章 →</a>` : ''}
         </div>
-        <div style="font-family:'Noto Serif SC','Source Han Serif SC',serif;font-size:17px;line-height:2;color:#333;">
+        <div class="content" style="font-family:'Noto Serif SC','Source Han Serif SC',serif;font-size:17px;line-height:2;color:#333;">
             ${html}
         </div>
         <div style="margin-top:30px;display:flex;gap:15px;font-size:14px;">
@@ -325,7 +371,7 @@ app.get('/chapter/:id/read', (req, res) => {
             ${next ? `<a href="/chapter/${next.id}/read" class="btn btn-outline btn-sm">下一章 →</a>` : ''}
         </div>
     </div>`;
-    res.send(layout(ch.title, body, `<style>.content p{text-indent:2em;}.content h1{text-align:center;text-indent:0;margin:30px 0;}</style>`));
+    res.send(layout(ch.title, body, `<style>.content p{text-indent:2em;margin:0.8em 0;}.content h1{text-align:center;text-indent:0;margin:30px 0;}</style>`));
 });
 
 // Edit chapter
@@ -348,7 +394,7 @@ app.get('/chapter/:id/edit', (req, res) => {
             <span id="wordDisplay" style="font-size:13px;color:#999;line-height:28px;">${ch.word_count}字</span>
         </div>
         <textarea id="editor" style="width:100%;height:70vh;padding:20px;font-size:16px;line-height:1.8;border:1px solid #ddd;border-radius:4px;background:#fff;font-family:'Microsoft YaHei',sans-serif;">${ch.content.replace(/</g,'&lt;')}</textarea>
-        <div id="preview" style="display:none;background:#fff;border:1px solid #ddd;border-radius:4px;padding:30px;line-height:2;font-size:16px;min-height:50vh;"></div>
+        <div id="preview" class="content" style="display:none;background:#fff;border:1px solid #ddd;border-radius:4px;padding:30px;line-height:2;font-size:16px;min-height:50vh;"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\/script>
     <script>
@@ -397,7 +443,7 @@ app.get('/chapter/:id/edit', (req, res) => {
 
         setInterval(save, 60000);
     <\/script>`;
-    res.send(layout(`编辑 - ${ch.title}`, body));
+    res.send(layout(`编辑 - ${ch.title}`, body, `<style>.content p{text-indent:2em;margin:0.8em 0;}.content h1{text-align:center;text-indent:0;margin:30px 0;}</style>`));
 });
 
 // Save chapter
