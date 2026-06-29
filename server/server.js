@@ -168,10 +168,15 @@ app.get('/novel/:id', (req, res) => {
     }
     const novel = getNovel.get(novelId);
     if (!novel) return res.status(404).send('小说不存在');
-    const chapters = getChapters.all(novelId);
-    const totalWords = chapters.reduce((s, c) => s + (c.word_count || 0), 0);
-    const statusCount = { draft: 0, published: 0 };
-    chapters.forEach(c => statusCount[c.status] = (statusCount[c.status] || 0) + 1);
+    const allChapters = getChapters.all(novelId);
+    const totalWords = allChapters.reduce((s, c) => s + (c.word_count || 0), 0);
+
+    // ── 分页 ──
+    const PAGE_SIZE = 20;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const totalPages = Math.max(1, Math.ceil(allChapters.length / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    const chapters = allChapters.slice(start, start + PAGE_SIZE);
 
     const chapterRows = chapters.map((ch, i) => `
         <div class="card">
@@ -191,23 +196,48 @@ app.get('/novel/:id', (req, res) => {
         </div>
     `).join('');
 
+    // ── 分页导航 ──
+    const pageLinks = [];
+    const maxShow = 5;
+    let pStart = Math.max(1, page - Math.floor(maxShow / 2));
+    let pEnd = Math.min(totalPages, pStart + maxShow - 1);
+    if (pEnd - pStart < maxShow - 1) pStart = Math.max(1, pEnd - maxShow + 1);
+    for (let p = pStart; p <= pEnd; p++) {
+        if (p === page) {
+            pageLinks.push(`<span style="display:inline-block;padding:4px 12px;background:#d4a853;color:#fff;border-radius:4px;font-size:13px;font-weight:500;">${p}</span>`);
+        } else {
+            pageLinks.push(`<a href="/novel/${novelId}?page=${p}" style="display:inline-block;padding:4px 12px;color:#666;text-decoration:none;font-size:13px;border-radius:4px;">${p}</a>`);
+        }
+    }
+    const paginationHtml = totalPages > 1 ? `
+        <div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;padding:10px 0;">
+            ${page > 1 ? `<a href="/novel/${novelId}?page=${page-1}" class="btn btn-outline btn-sm">← 上一页</a>` : ''}
+            ${pageLinks.join('')}
+            ${page < totalPages ? `<a href="/novel/${novelId}?page=${page+1}" class="btn btn-outline btn-sm">下一页 →</a>` : ''}
+        </div>
+        <div style="text-align:center;font-size:12px;color:#bbb;margin-top:4px;">
+            第 ${start+1}-${Math.min(start+PAGE_SIZE, allChapters.length)} 章 / 共 ${allChapters.length} 章
+        </div>
+    ` : '';
+
     const body = `
     ${navBar(novelId)}
     <div class="container">
         <div class="flex" style="margin-bottom:20px;">
             <div class="flex1">
                 <h1>${novel.title}</h1>
-                <div class="subtitle">${novel.author ? novel.author + ' · ' : ''}共 ${chapters.length} 章 · 约 ${(totalWords/1000).toFixed(1)}k 字</div>
+                <div class="subtitle">${novel.author ? novel.author + ' · ' : ''}共 ${allChapters.length} 章 · 约 ${(totalWords/1000).toFixed(1)}k 字</div>
             </div>
             <a href="/novel/${novelId}/import" class="btn btn-outline">导入.md文件</a>
             <a href="/novel/${novelId}/export" class="btn btn-outline">导出全部</a>
         </div>
         <div class="gap20 mb10">
-            <div class="stat-card"><div class="num">${chapters.length}</div><div class="label">章节</div></div>
+            <div class="stat-card"><div class="num">${allChapters.length}</div><div class="label">章节</div></div>
             <div class="stat-card"><div class="num">${Math.round(totalWords/1000)}k</div><div class="label">总字数</div></div>
-            <div class="stat-card"><div class="num">${chapters.length ? Math.round(totalWords/chapters.length) : 0}</div><div class="label">平均每章</div></div>
+            <div class="stat-card"><div class="num">${allChapters.length ? Math.round(totalWords/allChapters.length) : 0}</div><div class="label">平均每章</div></div>
         </div>
-        ${chapters.length > 0 ? chapterRows : '<div style="color:#999;text-align:center;padding:40px;">还没有章节，点击下方按钮新建</div>'}
+        ${allChapters.length > 0 ? chapterRows : '<div style="color:#999;text-align:center;padding:40px;">还没有章节，点击下方按钮新建</div>'}
+        ${paginationHtml}
         <a href="/novel/${novelId}/chapter/new" class="btn btn-primary mt10">＋ 新建章节</a>
     </div>`;
     res.send(layout(novel.title, body));
