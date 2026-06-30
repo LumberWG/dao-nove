@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} · 设定文档</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <div class="header-actions">
+      <a href="/docs/edit/{{ filename }}" class="btn-edit">✏️ 编辑</a>
+      <a href="/docs" class="back-link">← 设定列表</a>
+    </div>
+  </header>
+
+  <nav class="chapter-nav">
+    <a href="/docs" class="back-link">← 返回设定列表</a>
+  </nav>
+
+  <main class="reading doc-view">
+    <h2>{{ title }}</h2>
+    <div class="chapter-content doc-content">
+      {{ content | safe }}
+    </div>
+  </main>
+
+  <footer>
+    <p>{{ filename }} · <a href="/docs/edit/{{ filename }}">编辑</a></p>
+  </footer>
+</div>
+</body>
+</html>

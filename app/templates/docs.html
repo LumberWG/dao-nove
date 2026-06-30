@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设定文档 · 小说管理</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><a href="/">📖 小说管理</a></h1>
+    <a href="/" class="back-link">← 返回目录</a>
+  </header>
+
+  <main>
+    <h2>📋 设定文档</h2>
+    <p class="section-desc">世界观、人物档案、伏笔追踪等写作参考文档</p>
+
+    <div class="doc-list">
+      {% if docs %}
+        {% for doc in docs %}
+        <a href="/docs/view/{{ doc.filename }}" class="doc-card">
+          <span class="doc-icon">📄</span>
+          <span class="doc-title">{{ doc.title }}</span>
+          <span class="doc-arrow">→</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>docs/ 目录下没有找到设定文档</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    <p>共 {{ docs|length }} 份文档 · 存储在 docs/ 目录</p>
+  </footer>
+</div>
+</body>
+</html>
