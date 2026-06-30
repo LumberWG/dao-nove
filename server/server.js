@@ -68,10 +68,25 @@ if (existingNovels.length === 0) {
     files.forEach((f, idx) => {
         const filePath = path.resolve(__dirname, '..', f);
         const content = fs.readFileSync(filePath, 'utf8');
-        const firstLine = content.split('\n')[0].replace('# ', '').trim();
-        const clean = content.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
-        const wc = clean.length;
-        insertChapter.run(novelId, idx + 1, firstLine || f, content, wc);
+        let firstLine = content.split('\n')[0].trim().replace(/^﻿/, '').replace(/^#\s*/, '');
+        // 统一章号：第八章→第8章
+        firstLine = firstLine.replace(/第([一二三四五六七八九十百]+)章/g, function(m, cn) {
+            var d = {一:1,二:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9,十:10};
+            var n = 0;
+            for (var i = 0; i < cn.length; i++) {
+                var c = cn[i];
+                if (c === '十' && n === 0) n = 10;
+                else if (c === '十') n += 10;
+                else if (n >= 10) n += d[c];
+                else n = d[c];
+            }
+            return '第' + n + '章';
+        });
+        var title = /^第\d+\S/.test(firstLine) ? firstLine : f.replace(/\.md$/, '').replace(/新_第\d+章_/, '').replace(/_/g, ' ');
+        var fileNum = parseInt(f.match(/第(\d+)章/)[1]);
+        var clean = content.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
+        var wc = clean.length;
+        insertChapter.run(novelId, fileNum, title, content, wc);
     });
     console.log(`  Imported ${files.length} chapters into 《岁蚀》`);
 }
