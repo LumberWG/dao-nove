@@ -4,7 +4,7 @@
 """
 
 import os, re, glob, json
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 
 app = Flask(__name__)
 
@@ -299,6 +299,15 @@ def api_publish():
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(f"# 第{new_num}章 {title}\n\n{content}\n")
     return jsonify({'number': new_num, 'title': title, 'filename': filename})
+
+
+@app.route('/cover')
+def view_cover():
+    return render_template('cover.html', cover_image=True)
+
+@app.route('/cover-image')
+def cover_image():
+    return send_from_directory('static', 'cover.webp')
 
 
 if __name__ == '__main__':
