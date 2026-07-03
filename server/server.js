@@ -10,6 +10,13 @@ const DB_DIR = process.env.DB_DIR || __dirname;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' }));
 
+// ── 汉字计数 ──
+function countChinese(text) {
+    const clean = text.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
+    const hanzi = clean.match(/[一-鿿㐀-䶿豈-﫿]/g);
+    return hanzi ? hanzi.length : 0;
+}
+
 // ── Database ──
 const DB_PATH = path.join(DB_DIR, 'writer.db');
 const db = new Database(DB_PATH);
@@ -84,8 +91,7 @@ if (existingNovels.length === 0) {
         });
         var title = /^第\d+\S/.test(firstLine) ? firstLine : f.replace(/\.md$/, '').replace(/新_第\d+章_/, '').replace(/_/g, ' ');
         var fileNum = parseInt(f.match(/第(\d+)章/)[1]);
-        var clean = content.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
-        var wc = clean.length;
+        var wc = countChinese(content);
         insertChapter.run(novelId, fileNum, title, content, wc);
     });
     console.log(`  Imported ${files.length} chapters into 《岁蚀》`);
@@ -308,9 +314,7 @@ app.get('/novel/:id/import', (req, res) => {
         const filePath = path.resolve(__dirname, '..', f);
         const content = fs.readFileSync(filePath, 'utf8');
         const firstLine = content.split('\n')[0].replace('# ', '').trim();
-        const clean = content.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
-        const wc = clean.length;
-        // Avoid duplicates by checking title
+        const wc = countChinese(content);
         const dup = db.prepare('SELECT id FROM chapters WHERE novel_id=? AND title=?').get(novelId, firstLine);
         if (!dup) {
             insertChapter.run(novelId, existingMax + imported + 1, firstLine || f, content, wc);
@@ -496,11 +500,22 @@ app.post('/chapter/:id/save', (req, res) => {
     const ch = getChapter.get(req.params.id);
     if (!ch) return res.json({ ok: false });
     const { content, title } = req.body;
-    const clean = content.replace(/\s/g, '').replace(/（本章约\d+字）/g, '');
-    const wc = clean.length;
+    const wc = countChinese(content);
     let finalContent = content.replace(/（本章约\d+字）/g, '').trim();
     finalContent += `\n\n（本章约${wc}字）`;
     updateChapter.run(title || ch.title, finalContent, wc, req.params.id);
+
+    // Sync to md file
+    const chaptersDir = path.resolve(__dirname, '..', 'chapters');
+    const files = fs.readdirSync(chaptersDir).filter(f => f.startsWith('新_第') && f.endsWith('.md'));
+    const matchFile = files.find(f => {
+        const m = f.match(/新_第(\d+)章/);
+        return m && parseInt(m[1]) === ch.chapter_number;
+    });
+    if (matchFile) {
+        fs.writeFileSync(path.join(chaptersDir, matchFile), finalContent, 'utf8');
+    }
+
     res.json({ ok: true, wordCount: wc });
 });
 

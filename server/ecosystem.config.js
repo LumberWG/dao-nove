@@ -4,7 +4,7 @@ module.exports = {
     script: 'server.js',
     instances: 1,
     env: {
-      PORT: 3000,
+      PORT: 3001,
       DB_DIR: '.'
     }
   }]
