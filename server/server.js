@@ -69,11 +69,11 @@ const existingNovels = getNovels.all();
 if (existingNovels.length === 0) {
     // Try to import existing chapters from markdown files
     const novelId = insertNovel.run('岁蚀', '', '伪戒风格·300万字长篇').lastInsertRowid;
-    const files = fs.readdirSync(path.resolve(__dirname, '..'))
+    const files = fs.readdirSync(path.resolve(__dirname, '..', 'chapters'))
         .filter(f => f.startsWith('新_第') && f.endsWith('.md'))
         .sort();
     files.forEach((f, idx) => {
-        const filePath = path.resolve(__dirname, '..', f);
+        const filePath = path.resolve(__dirname, '..', 'chapters', f);
         const content = fs.readFileSync(filePath, 'utf8');
         let firstLine = content.split('\n')[0].trim().replace(/^﻿/, '').replace(/^#\s*/, '');
         // 统一章号：第八章→第8章
@@ -306,12 +306,12 @@ app.post('/novel/:id/update', (req, res) => {
 app.get('/novel/:id/import', (req, res) => {
     const novelId = req.params.id;
     const novel = getNovel.get(novelId);
-    const files = fs.readdirSync(path.resolve(__dirname, '..'))
+    const files = fs.readdirSync(path.resolve(__dirname, '..', 'chapters'))
         .filter(f => f.endsWith('.md') && !f.includes('archive'));
     const existingMax = getMaxChapterNum.get(novelId).max_num;
     let imported = 0;
     files.forEach(f => {
-        const filePath = path.resolve(__dirname, '..', f);
+        const filePath = path.resolve(__dirname, '..', 'chapters', f);
         const content = fs.readFileSync(filePath, 'utf8');
         const firstLine = content.split('\n')[0].replace('# ', '').trim();
         const wc = countChinese(content);
