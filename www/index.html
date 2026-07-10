@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>岁蚀 · 在线阅读</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'Noto Sans SC', sans-serif; background: #f5f3ef; color: #2c2c2c; }
+.container { max-width: 1400px; margin: 0 auto; display: flex; min-height: 100vh; }
+.sidebar { width: 280px; background: #fff; border-right: 1px solid #e0dcd5; padding: 24px; overflow-y: auto; position: sticky; top: 0; height: 100vh; flex-shrink: 0; }
+.sidebar h1 { font-size: 20px; margin-bottom: 4px; color: #1a1a1a; }
+.sidebar .subtitle { font-size: 12px; color: #999; margin-bottom: 20px; }
+.sidebar h2 { font-size: 13px; color: #666; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 1px; }
+.sidebar a { display: block; padding: 4px 0; font-size: 14px; color: #444; text-decoration: none; border-bottom: 1px solid #f0eee8; }
+.sidebar a:hover { color: #c0392b; }
+.sidebar .arc-label { font-size: 11px; color: #aaa; padding: 2px 0; }
+.sidebar .active { color: #c0392b; font-weight: 600; }
+.main { flex: 1; padding: 40px 48px; max-width: 800px; line-height: 1.8; }
+.main h1 { font-size: 26px; margin-bottom: 20px; }
+.main p { margin-bottom: 1em; }
+.main hr { border: none; border-top: 1px solid #e0dcd5; margin: 2em 0; }
+.main strong { color: #1a1a1a; }
+#content { min-height: 60vh; }
+#welcome { text-align: center; padding: 100px 0; color: #999; }
+#welcome h2 { font-size: 28px; color: #ccc; margin-bottom: 12px; }
+.loading { text-align: center; padding: 60px; color: #aaa; }
+@media(max-width:768px){
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; padding: 16px; }
+  .main { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="sidebar" id="sidebar"></nav>
+  <div class="main">
+    <div id="welcome">
+      <h2>岁蚀</h2>
+      <p>选择一个章节开始阅读</p>
+    </div>
+    <div id="content" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  // 弧1 旧雨
+  {n:1, t:'旧货摊前的雨', a:'弧1·旧雨'},
+  {n:2, t:'两种未来', a:'弧1·旧雨'},
+  {n:3, t:'许老头的粥', a:'弧1·旧雨'},
+  {n:4, t:'纹路', a:'弧1·旧雨'},
+  {n:5, t:'红姑的故事', a:'弧1·旧雨'},
+  {n:6, t:'心湖', a:'弧1·旧雨'},
+  {n:7, t:'封印', a:'弧1·旧雨'},
+  {n:8, t:'隙径', a:'弧1·旧雨'},
+  {n:9, t:'归寂院', a:'弧1·旧雨'},
+  {n:10, t:'柳三娘', a:'弧1·旧雨'},
+  {n:11, t:'追兵', a:'弧1·旧雨'},
+  {n:12, t:'沈见微', a:'弧1·旧雨'},
+  {n:13, t:'不会做梦的人', a:'弧1·旧雨'},
+  {n:14, t:'裂痕', a:'弧1·旧雨'},
+  {n:15, t:'擦肩而过', a:'弧1·旧雨'},
+  {n:16, t:'青石集', a:'弧1·旧雨'},
+  {n:17, t:'铜钱老人', a:'弧1·旧雨'},
+  {n:18, t:'不动', a:'弧1·旧雨'},
+  {n:19, t:'纪无咎', a:'弧1·旧雨'},
+  // 弧2 秩序之门
+  {n:20, t:'十日', a:'弧2·秩序之门'},
+  {n:21, t:'界碑', a:'弧2·秩序之门'},
+  {n:22, t:'入城', a:'弧2·秩序之门'},
+  {n:23, t:'序塔', a:'弧2·秩序之门'},
+  {n:24, t:'对峙', a:'弧2·秩序之门'},
+  {n:25, t:'万流坊', a:'弧2·秩序之门'},
+  {n:26, t:'灰市集', a:'弧2·秩序之门'},
+  {n:27, t:'隙径行者', a:'弧2·秩序之门'},
+  {n:28, t:'旧庙', a:'弧2·秩序之门'},
+  {n:29, t:'隙径向导', a:'弧2·秩序之门'},
+  {n:30, t:'苏缠', a:'弧2·秩序之门'},
+  {n:31, t:'不要靠近我', a:'弧2·秩序之门'},
+  {n:32, t:'岁蚀前兆', a:'弧2·秩序之门'},
+  // 弧3 湖底
+  {n:33, t:'燃命者', a:'弧3·湖底'},
+  {n:34, t:'许老头的坦白', a:'弧3·湖底'},
+  {n:35, t:'心湖之下', a:'弧3·湖底'},
+  {n:36, t:'苦战', a:'弧3·湖底'},
+  {n:37, t:'代价', a:'弧3·湖底'},
+  {n:38, t:'心湖之门', a:'弧3·湖底'},
+  {n:39, t:'因果铺', a:'弧3·湖底'},
+  {n:40, t:'三选一', a:'弧3·湖底'},
+  {n:41, t:'序塔下面', a:'弧3·湖底'},
+  {n:42, t:'门那边', a:'弧3·湖底'},
+  {n:43, t:'许老头的抉择', a:'弧3·湖底'},
+  {n:44, t:'季真', a:'弧3·湖底'},
+  {n:45, t:'霍斩', a:'弧3·湖底'},
+  // 弧4 星散
+  {n:46, t:'方主簿', a:'弧4·星散'},
+  {n:47, t:'心湖的最后一夜', a:'弧4·星散'},
+  {n:48, t:'荷包蛋', a:'弧4·星散'},
+  {n:49, t:'解绳', a:'弧4·星散'},
+  {n:50, t:'苏缠之缠', a:'弧4·星散'},
+  {n:51, t:'花生藤和锈剑', a:'弧4·星散'},
+  {n:52, t:'沈见微的倒戈', a:'弧4·星散'},
+  {n:53, t:'白无瑕的面摊', a:'弧4·星散'},
+  {n:54, t:'霍斩的铁刀', a:'弧4·星散'},
+  {n:55, t:'季真的石碑', a:'弧4·星散'},
+  {n:56, t:'许老头煮粥', a:'弧4·星散'},
+  {n:57, t:'瓜子壳的算术题', a:'弧4·星散'},
+  {n:58, t:'阿芷的铜钱·上', a:'弧4·星散'},
+  {n:59, t:'阿芷的铜钱·下', a:'弧4·星散'},
+  // 弧5 推门
+  {n:60, t:'老槐树', a:'弧5·推门'},
+  {n:61, t:'十息', a:'弧5·推门'},
+  {n:62, t:'沈见微的最后一次清醒', a:'弧5·推门'},
+  {n:63, t:'老陈的最后一份情报', a:'弧5·推门'},
+  {n:64, t:'岁蚀降临', a:'弧5·推门'},
+  {n:65, t:'推门', a:'弧5·推门'},
+];
+
+const docs = [
+  '核心设定','人物档案','人物出场记录','伏笔与线索追踪',
+  '世界观设定','势力体系','势力来历与恩怨纠缠',
+  '岁蚀设定','功法与战斗体系','队伍管理与群像塑造',
+  '地理与世界地图','笔法核心规则','系统与情节对照表',
+  '全书新纲要','法宝作用演变说明'
+];
+
+let currentArc = '';
+
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '<h1>岁蚀</h1><div class="subtitle">在线阅读</div>';
+  html += '<h2>章节</h2>';
+  let lastArc = '';
+  chapters.forEach(ch => {
+    if (ch.a !== lastArc) {
+      html += `<div class="arc-label">${ch.a}</div>`;
+      lastArc = ch.a;
+    }
+    const num = ch.n.toString().padStart(2,'0');
+    html += `<a href="#" onclick="loadChapter(${ch.n});return false" id="chlink-${ch.n}">${num}. ${ch.t}</a>`;
+  });
+  html += '<h2>设定文档</h2>';
+  docs.forEach(d => {
+    const fn = d.replace(/ /g,'').replace(/·/g,'');
+    html += `<a href="#" onclick="loadDoc('${fn}');return false" id="doclink-${fn}">${d}</a>`;
+  });
+  sb.innerHTML = html;
+}
+
+async function loadChapter(n) {
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  const link = document.getElementById(`chlink-${n}`);
+  if(link) link.classList.add('active');
+  const num = n.toString().padStart(2,'0');
+  const ch = chapters.find(c => c.n === n);
+  try {
+    const resp = await fetch(`chapters/新_第${num}章_${ch.t}.md`);
+    if(!resp.ok) throw new Error('404');
+    const text = await resp.text();
+    const html = marked.parse(text);
+    document.getElementById('content').innerHTML = html;
+    window.scrollTo(0, 0);
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<p>章节加载失败</p>';
+  }
+}
+
+async function loadDoc(name) {
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  const link = document.getElementById(`doclink-${name}`);
+  if(link) link.classList.add('active');
+  try {
+    const resp = await fetch(`docs/${name}.md`);
+    if(!resp.ok) throw new Error('404');
+    const text = await resp.text();
+    const html = marked.parse(text);
+    document.getElementById('content').innerHTML = html;
+    window.scrollTo(0, 0);
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<p>文档加载失败</p>';
+  }
+}
+
+renderSidebar();
+</script>
+</body>
+</html>
