@@ -1,6 +1,7 @@
 const fs = require('fs');
+const endChapter = 25;
 let html = '<!DOCTYPE html><html lang=zh-CN><head><meta charset=utf-8>';
-html += '<title>岁蚀·第1-20章</title>';
+html += `<title>岁蚀·第1-${endChapter}章</title>`;
 html += '<style>';
 html += 'body{font-family:"Noto Serif SC","SimSun",serif;max-width:720px;margin:0 auto;padding:40px 20px;line-height:2;font-size:17px;color:#1a1a1a}';
 html += 'h1{text-align:center;font-size:28px;margin:1em 0 0.5em}';
@@ -11,8 +12,8 @@ html += 'p{margin:0.3em 0;text-indent:2em}';
 html += 'strong{font-weight:600}';
 html += '.chapter-title{text-align:center;font-size:24px;font-weight:600;margin:3em 0 1.5em}';
 html += '</style></head><body>';
-html += '<h1>岁蚀</h1><h2>卷一·旧雨不来</h2><p style="text-align:center;color:#888;text-indent:0">第1-20章</p><hr>';
-for (let i = 1; i <= 20; i++) {
+html += `<h1>岁蚀</h1><h2>卷一·旧雨不来 / 弧2·秩序之门</h2><p style="text-align:center;color:#888;text-indent:0">第1-${endChapter}章</p><hr>`;
+for (let i = 1; i <= endChapter; i++) {
   const files = fs.readdirSync('chapters').filter(f => f.startsWith('新_第' + i + '章'));
   if (files.length === 0) continue;
   let md = fs.readFileSync('chapters/' + files[0], 'utf8');
@@ -35,5 +36,6 @@ for (let i = 1; i <= 20; i++) {
   html += chapter + '<hr>';
 }
 html += '</body></html>';
-fs.writeFileSync('岁蚀_1-20章.html', html, 'utf8');
-console.log('Done: 岁蚀_1-20章.html (' + (fs.statSync('岁蚀_1-20章.html').size / 1024).toFixed(0) + 'KB)');
+const outPath = `www/岁蚀_1-${endChapter}章.html`;
+fs.writeFileSync(outPath, html, 'utf8');
+console.log(`Done: ${outPath} (` + (fs.statSync(outPath).size / 1024).toFixed(0) + 'KB)');
