@@ -1,5 +1,5 @@
 const fs = require('fs');
-const endChapter = 25;
+const endChapter = 42;
 let html = '<!DOCTYPE html><html lang=zh-CN><head><meta charset=utf-8>';
 html += `<title>岁蚀·第1-${endChapter}章</title>`;
 html += '<style>';
@@ -12,7 +12,7 @@ html += 'p{margin:0.3em 0;text-indent:2em}';
 html += 'strong{font-weight:600}';
 html += '.chapter-title{text-align:center;font-size:24px;font-weight:600;margin:3em 0 1.5em}';
 html += '</style></head><body>';
-html += `<h1>岁蚀</h1><h2>卷一·旧雨不来 / 弧2·秩序之门</h2><p style="text-align:center;color:#888;text-indent:0">第1-${endChapter}章</p><hr>`;
+html += `<h1>岁蚀</h1><h2>卷一·旧雨不来 / 弧2·序隙之裂</h2><p style="text-align:center;color:#888;text-indent:0">第1-${endChapter}章</p><hr>`;
 for (let i = 1; i <= endChapter; i++) {
   const files = fs.readdirSync('chapters').filter(f => f.startsWith('新_第' + i + '章'));
   if (files.length === 0) continue;
@@ -37,5 +37,7 @@ for (let i = 1; i <= endChapter; i++) {
 }
 html += '</body></html>';
 const outPath = `www/岁蚀_1-${endChapter}章.html`;
+// remove old 1-25 file if exists
+try { fs.unlinkSync('www/岁蚀_1-25章.html'); } catch(e) {}
 fs.writeFileSync(outPath, html, 'utf8');
 console.log(`Done: ${outPath} (` + (fs.statSync(outPath).size / 1024).toFixed(0) + 'KB)');
