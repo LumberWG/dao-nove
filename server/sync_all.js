@@ -55,7 +55,7 @@ const dbPath = path.resolve(__dirname, 'writer.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
-const chaptersDir = path.resolve(__dirname, '..', 'chapters');
+const chaptersDir = path.resolve(__dirname, '..', 'chapters', '卷一');
 const files = fs.readdirSync(chaptersDir)
     .filter(f => f.startsWith('新_第') && f.endsWith('.md'))
     .sort((a, b) => {

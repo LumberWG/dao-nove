@@ -27,8 +27,8 @@ jobs:
         run: |
           mkdir -p _site
           cp -r www/* _site/
-          mkdir -p _site/chapters _site/docs
-          cp chapters/*.md _site/chapters/
+          mkdir -p _site/chapters _site/chapters/卷一 _site/docs
+          cp chapters/卷一/*.md _site/chapters/卷一/
           cp docs/*.md _site/docs/
 
       - name: 上传 Pages 产物

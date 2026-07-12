@@ -178,7 +178,7 @@ async function loadChapter(n) {
   const num = n.toString().padStart(2,'0');
   const ch = chapters.find(c => c.n === n);
   try {
-    const resp = await fetch(`chapters/新_第${num}章_${ch.t}.md`);
+    const resp = await fetch(`chapters/卷一/新_第${num}章_${ch.t}.md`);
     if(!resp.ok) throw new Error('404');
     const text = await resp.text();
     const html = marked.parse(text);
