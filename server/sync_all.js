@@ -55,12 +55,29 @@ const dbPath = path.resolve(__dirname, 'writer.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
-const chaptersDir = path.resolve(__dirname, '..', 'chapters', '卷一');
-const files = fs.readdirSync(chaptersDir)
-    .filter(f => f.startsWith('新_第') && f.endsWith('.md'))
+const chaptersDir = path.resolve(__dirname, '..', 'chapters');
+
+function walkDir(dir) {
+  let results = [];
+  const list = fs.readdirSync(dir);
+  list.forEach(f => {
+    const full = path.join(dir, f);
+    const stat = fs.statSync(full);
+    if (stat && stat.isDirectory()) {
+      results = results.concat(walkDir(full));
+    } else if (stat && stat.isFile() && f.startsWith('新_第') && f.endsWith('.md')) {
+      results.push(full);
+    }
+  });
+  return results;
+}
+
+const files = walkDir(chaptersDir)
     .sort((a, b) => {
-        const na = parseInt((a.match(/新_第(\d+)章/) || [0, 0])[1]);
-        const nb = parseInt((b.match(/新_第(\d+)章/) || [0, 0])[1]);
+        const baseA = path.basename(a);
+        const baseB = path.basename(b);
+        const na = parseInt((baseA.match(/新_第(\d+)章/) || [0, 0])[1]);
+        const nb = parseInt((baseB.match(/新_第(\d+)章/) || [0, 0])[1]);
         return na - nb;
     });
 
@@ -83,9 +100,9 @@ const updateStmt = db.prepare('UPDATE chapters SET title=?, content=?, word_coun
 const insertStmt = db.prepare('INSERT INTO chapters (novel_id, chapter_number, title, content, word_count) VALUES (?, ?, ?, ?, ?)');
 
 for (const f of files) {
-    const filePath = path.join(chaptersDir, f);
+    const filePath = f;
     const content = fs.readFileSync(filePath, 'utf8');
-    const { chapterNum, title } = extractTitleAndNum(content, f);
+    const { chapterNum, title } = extractTitleAndNum(content, path.basename(f));
     const wc = countChinese(content);
 
     if (!chapterNum) {
