@@ -29,6 +29,11 @@ const ch = db.prepare('SELECT id, title FROM chapters WHERE chapter_number=? AND
 if (ch) {
     db.prepare('UPDATE chapters SET content=?, word_count=?, updated_at=datetime(\'now\',\'localtime\') WHERE id=?').run(content, wc, ch.id);
     console.log(ch.title + ' updated: ' + wc + ' 汉字');
+} else {
+    const titleMatch = matchFile.match(/新_第\d+章_(.+?)\.md$/);
+    const title = titleMatch ? '第' + parseInt(chapterNum) + '章 ' + titleMatch[1] : '第' + parseInt(chapterNum) + '章';
+    db.prepare('INSERT INTO chapters (novel_id, chapter_number, title, content, word_count, created_at, updated_at) VALUES (?, ?, ?, ?, ?, datetime(\'now\',\'localtime\'), datetime(\'now\',\'localtime\'))').run(1, parseInt(chapterNum), title, content, wc);
+    console.log(title + ' inserted: ' + wc + ' 汉字');
 }
 
 const total = db.prepare('SELECT SUM(word_count) as total FROM chapters').get();
